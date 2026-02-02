@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Will you be my Valentine?</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+<style>
+:root {
+  --bg1:#ffd6e7;
+  --bg2:#ffeef6;
+  --yes:#ff3b7a;
+  --yesHover:#ff1f68;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  min-height:100svh;
+  display:grid;
+  place-items:center;
+  background:radial-gradient(circle at top,var(--bg2),var(--bg1));
+  font-family:system-ui,sans-serif;
+  overflow:hidden;
+}
+
+.card {
+  width:min(720px,92vw);
+  padding:28px;
+  background:#ffffffcc;
+  backdrop-filter:blur(12px);
+  border-radius:26px;
+  text-align:center;
+  box-shadow:0 25px 80px rgba(0,0,0,.18);
+  z-index:1;
+}
+
+h1 {
+  font-size:clamp(26px,4vw,44px);
+  min-height:3em;
+}
+
+.sub {
+  opacity:.75;
+  font-size:14px;
+  margin-bottom:14px;
+}
+
+.button-zone {
+  position:relative;
+  width:min(520px,95%);
+  height:170px;
+  margin:0 auto;
+}
+
+button {
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  padding:16px 26px;
+  font-size:18px;
+  font-weight:800;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  box-shadow:0 12px 28px rgba(0,0,0,.16);
+  transition:.2s;
+}
+
+#yesBtn {
+  left:18%;
+  background:var(--yes);
+  color:white;
+}
+
+#yesBtn:hover { background:var(--yesHover); }
+
+#noBtn {
+  left:62%;
+  background:#e5e7eb;
+}
+
+.hint {
+  font-size:13px;
+  opacity:.7;
+  margin-top:8px;
+}
+
+/* CONFETTI */
+#confetti {
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  z-index:9999;
+  pointer-events:none;
+}
+
+/* GIF OVERLAY */
+#gifOverlay {
+  position:fixed;
+  inset:0;
+  background:rgba(255,214,231,.9);
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:9998;
+  text-align:center;
+  animation:fadeIn .4s ease;
+}
+
+#gifOverlay img {
+  width:min(380px,80vw);
+  border-radius:22px;
+  box-shadow:0 25px 70px rgba(0,0,0,.3);
+  transition:transform .15s ease;
+}
+
+#gifOverlay img:active {
+  transform:scale(1.18) rotate(-4deg);
+}
+
+.love-text {
+  margin-top:18px;
+  font-size:20px;
+  font-weight:600;
+  color:#7a0035;
+  line-height:1.4;
+  max-width:520px;
+}
+
+.tapText {
+  margin-top:10px;
+  font-size:14px;
+  opacity:.7;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; }
+  to { opacity:1; }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div class="card" id="card">
+  <h1 id="type"></h1>
+  <div class="sub">Saying “No” may cause button anxiety 😌</div>
+
+  <section class="button-zone" id="zone">
+    <button id="yesBtn">Yes 💖</button>
+    <button id="noBtn">No 😏</button>
+  </section>
+
+  <div class="hint" id="hint">The “No” button looks nervous…</div>
+</div>
+
+<!-- GIF OVERLAY -->
+<div id="gifOverlay">
+	<img
+	id="celebrateGif"
+	src="https://media.giphy.com/media/11rWoZNpAKw8w/giphy.gif"
+	alt="Celebration"
+	/>  
+  
+  <div class="love-text">
+    You just made my Valentine’s Day perfect 💕<br/>
+    Dinner’s on me. Forever.
+  </div>
+  <div class="tapText">Tap the GIF for more confetti 💖</div>
+  <img
+	id="celebrateGif"
+	src="https://media.giphy.com/media/26FLdmIp6wJr91JAI/giphy.gif"
+	alt="Celebration"
+	/>
+</div>
+
+<script>
+/* TYPEWRITER */
+const text="Hello Dr. Mehak Merani, will you be my Valentine? 💕";
+let i=0;
+const typeEl=document.getElementById("type");
+(function type(){
+  if(i<text.length){
+    typeEl.textContent+=text.charAt(i++);
+    setTimeout(type,55);
+  }
+})();
+
+/* CONFETTI SETUP */
+const canvas=document.getElementById("confetti");
+
+function resizeCanvas(){
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=innerWidth*dpr;
+  canvas.height=innerHeight*dpr;
+}
+resizeCanvas();
+window.addEventListener("resize",resizeCanvas);
+
+const confettiInstance=confetti.create(canvas,{
+  resize:false,
+  useWorker:true
+});
+
+function fullScreenCelebrate(){
+  const end=Date.now()+2000;
+
+  (function frame(){
+    confettiInstance({
+      particleCount:18,
+      spread:120,
+      startVelocity:55,
+      origin:{x:Math.random(),y:Math.random()*0.4}
+    });
+    if(Date.now()<end) requestAnimationFrame(frame);
+  })();
+
+  setTimeout(()=>{
+    confettiInstance({
+      particleCount:400,
+      spread:160,
+      startVelocity:70,
+      origin:{x:.5,y:.6}
+    });
+  },400);
+}
+
+/* BUTTON BEHAVIOR */
+const yes=document.getElementById("yesBtn");
+const no=document.getElementById("noBtn");
+const zone=document.getElementById("zone");
+const hint=document.getElementById("hint");
+const card=document.getElementById("card");
+const overlay=document.getElementById("gifOverlay");
+const gif=document.getElementById("celebrateGif");
+
+let yesScale=1;
+let escapeLevel=0;
+
+function moveNo(){
+  const z=zone.getBoundingClientRect();
+  const b=no.getBoundingClientRect();
+  no.style.left=Math.random()*(z.width-b.width)+"px";
+  no.style.top=Math.random()*(z.height-b.height)+"px";
+}
+
+zone.addEventListener("pointermove",()=>{
+  escapeLevel++;
+  moveNo();
+  yesScale=Math.min(2.4,yesScale+.08);
+  yes.style.transform=`translateY(-50%) scale(${yesScale})`;
+
+  if(escapeLevel>12){
+    no.textContent="pls 😭";
+    hint.textContent="It’s struggling…";
+  }
+  if(escapeLevel>18){
+    no.style.opacity="0";
+    hint.textContent="No has left the chat.";
+  }
+});
+
+/* YES CLICK */
+yes.addEventListener("click",()=>{
+  card.style.display="none";
+  overlay.style.display="flex";
+  resizeCanvas();
+  fullScreenCelebrate();
+});
+
+/* GIF CLICK = MORE CONFETTI */
+gif.addEventListener("click",()=>{
+  confettiInstance({
+    particleCount:220,
+    spread:150,
+    startVelocity:65,
+    origin:{x:.5,y:.5}
+  });
+});
+</script>
+
+</body>
+</html>
